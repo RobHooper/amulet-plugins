@@ -64,9 +64,7 @@ class AmuletWrapper:
                             blk = Block("minecraft", "air", {})
                         else:
                             continue
-
-                    print(blk)
-
+                        
                     self.world.set_version_block(
                             blx,
                             bly,

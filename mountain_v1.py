@@ -13,35 +13,51 @@ import random
 import json
 
 import numpy as np
+import random
 
 from lib.myamulet import AmuletWrapper
-
+from lib.noise import generate_perlin_noise
 
 def main(world: BaseLevel, dimension: Dimension, selection: SelectionGroup, options: dict):
 
-    foo = AmuletWrapper(world, dimension, selection, options)
+    myamulet = AmuletWrapper(world, dimension, selection, options)
 
     ## Init Matrix
-    arrshape = (foo.width, foo.depth)
+    arrshape = (myamulet.width, myamulet.depth)
     arr = np.zeros(arrshape, dtype=int)
 
-    #arr[0] = 1
-    arr[6] = 1
+    #def generate_perlin_noise(width, depth, height, grid_size = 10, seed = 10):
+
+    seed = options['Random Seed']
+    if options['Random Seed'] == -1:
+        seed = int(random.random() * 10 ** 9) # seed has to be less than (2 ** 32 - 1)
+
+    arr = np.add(
+                arr,
+                generate_perlin_noise(
+                     width = myamulet.width, 
+                     depth = myamulet.depth, 
+                     height = myamulet.height, 
+                     grid_size = options['Frequency'], 
+                     seed = seed
+                     )
+            )
 
     print(arr)
 
-    foo.build(arr)
+    myamulet.build(arr)
 
     print("Complete!")
 
 def options():
     return AmuletWrapper.options() | {
-        "Foobar": ["bool", True]
+        "Frequency": ["int", 5], # This effects how "smooth" the results are
+        "Random Seed": ["int", -1] # -1 for a random
     }
 
 
 export = {
-    "name": "Mountain Generator v1",
+    "name": "Perlin Noise",
     "operation": main,
     "options": options()
 }
