@@ -26,7 +26,7 @@ class AmuletWrapper:
 
     @property
     def height(self):
-        return self.box.max_y - self.box.min_y +1
+        return self.box.max_y - self.box.min_y
 
     @staticmethod
     def options():

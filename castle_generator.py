@@ -35,7 +35,7 @@ def myFunction(world: BaseLevel, dimension: Dimension, selection: SelectionGroup
 
     width = maxx - minx
     depth = maxz - minz
-    height = maxy - miny + 1
+    height = maxy - miny
 
     # We can ensure a clean wall by overwriting the user selection
     if options['Fix Dimples'] == True:
@@ -111,7 +111,7 @@ def myFunction(world: BaseLevel, dimension: Dimension, selection: SelectionGroup
                 bly = y + miny
                 #print(f"debug: {x}, {y}, {z}")
 
-                if arr[x][z] > 1:
+                if arr[x][z] >= 1:
                     block = Block("minecraft", "stone", {})
                     arr[x][z] -= 1
                 else:
