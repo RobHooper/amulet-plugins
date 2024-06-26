@@ -63,7 +63,6 @@ def myFunction(world: BaseLevel, dimension: Dimension, selection: SelectionGroup
 
     # Create walls
     for wallsize in range(options["Wall Width"]):
-        #print(wallsize)
         arr[wallsize + walloffset] = [wallheight]
         arr[:,wallsize + walloffset] = [wallheight]
         arr[-wallsize -1 - walloffset] = [wallheight]
@@ -71,8 +70,6 @@ def myFunction(world: BaseLevel, dimension: Dimension, selection: SelectionGroup
 
     # Towers
     if options["Towers"] == True:
-        walloffset = int(options["Tower Size"] / 3)
-
         for towersizex in range(options["Tower Size"]):
             for towersizez in range(options["Tower Size"]):
                 arr[towersizex][towersizez] = height
@@ -83,17 +80,26 @@ def myFunction(world: BaseLevel, dimension: Dimension, selection: SelectionGroup
     # Dimple
 
     if options['Dimples'] == True:
-        # Original solution:
+        ## Solution 1, Doubles up on block removal:
         #for row in range(1, width, 2):
         #    arr[row] -= 1
         #
         #for row in range(1, depth, 2):
         #    arr[:,row] -= 1
 
+        ## Solution 2, only works on specific size castles:
         dimples = np.array([0,1])
         dimples = np.resize(dimples, arrshape)
 
-        # print(dimples)
+        ## Solution 3:
+        #dimples = np.zeros(arrshape, dtype=int)
+        #for row in range(1, width, 2):
+        #    dimples[row] = 1
+        #
+        #for row in range(1, depth, 2):
+        #    dimples[:,row] = 1
+
+        # print(dimples) # Debug
         arr = np.subtract(arr, dimples)
 
     ## Actually place blocks
