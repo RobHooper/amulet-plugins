@@ -37,6 +37,39 @@ class AmuletWrapper:
             "Flatten": ["bool", True]
         }
     
+    def block_at(self, x, y, z):
+        """Get the block at a given location in the world's version"""
+        try:
+            block, blockEntity = self.world.get_version_block(
+                x, y, z, self.dimension, (self.world.level_wrapper.platform, self.world.level_wrapper.version)
+            )
+            return block, blockEntity
+        except:
+            return None, None
+
+
+    def height_map(self):
+        """
+        Returns an array of current block heights.
+        Note: There must be a more efficient way to do this....
+        """
+        arr = np.zeros((self.width, self.depth))
+
+        for x in range(self.width):
+            blx = x + self.box.min_x
+            for z in range(self.depth):
+                blz = z + self.box.min_z
+                for y in range(self.height):
+                    bly = y + self.box.min_y
+
+                    block, _ = self.block_at(blx, bly, blz)
+
+                    if block != None and str(block) != "minecraft:air":
+                        arr[x][z] += 1
+
+        return arr
+
+
     def build(self, 
               arr: np.ndarray,
               block: Block = Block("minecraft", "stone", {}), 
