@@ -65,12 +65,8 @@ def main(world: BaseLevel, dimension: Dimension, selection: SelectionGroup, opti
         print("Foo"+str(frequency)+str(iter))
         addNoise(myarray, frequency ** iter)
 
+    # fixme: Pass arr through filter multiplying only tiles near the center.
 
-    # todo:
-    # * Pass arr through filter multiplying only tiles near the center.
-
-    #print("building...")
-    #print(myarray.normalised())
     myamulet.build(np.multiply(myarray.normalised(), myamulet.height))
 
     print("Complete!")
