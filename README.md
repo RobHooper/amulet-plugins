@@ -23,10 +23,13 @@ Options:
 * Frequency - Increase resolution / noise detail
 * Random Seed - Set the seed used for generation (use -1 for a random value.)
 
-### mountain_v1.py **WIP**
-Generate mountains using Perlin noise, runs multiple layers of noise and merge together.
+### mountain_v1.py
+Generate mountains using Perlin noise, runs multiple layers of noise and then merge together.
+
+> [!NOTE]
+> This code is very CPU intensive
 
 Options:
 * Flatten - Replace pre-existing blocks with air
-* Merge with Ground - Load existing block height into calculation.
+* Merge edges - Reduce effect towards the edges of the selection
 * Random Seed - Set the seed used for generation (use -1 for a random value.)
