@@ -8,46 +8,27 @@ from amulet.api.block import Block  # For working with Blocks
 from amulet.api.block_entity import BlockEntity
 from amulet_nbt import *  # For working with block properties
 
-import math
 import random
-import json
 
 import numpy as np
 import random
 
 from lib.myamulet import AmuletWrapper
-from lib.noise import generate_perlin_noise
-
-class ArrayHelper:
-    def __init__(self, width, depth, height):
-        self.height = height
-        self.arr = np.zeros((width, depth))
-    
-    def mergeArray(self, array2):
-        if self.arr.shape == array2.shape:
-            self.arr = np.add(self.arr, array2)
-        else:
-            # UGH 
-            self.arr = np.add(self.arr, np.rot90(array2, 1))
-
-    def normalised(self):
-        return self.arr * (1.0/self.arr.max())
-
+from lib.noise import generate_perlin_noise, center_grid
+from lib.arrayhelper import ArrayHelper
 
 def main(world: BaseLevel, dimension: Dimension, selection: SelectionGroup, options: dict):
 
     myamulet = AmuletWrapper(world, dimension, selection, options)
 
-    myarray = ArrayHelper(myamulet.width, myamulet.depth, myamulet.height)
+    myarray = ArrayHelper(depth = myamulet.depth, width = myamulet.width, height = myamulet.height)
     #print(myarray.arr)
 
     seed = options['Random Seed']
     if options['Random Seed'] == -1:
+        ## UGH, Amulet limits int values to 30000000
         seed = int(random.random() * 10 ** 9) # seed has to be less than (2 ** 32 - 1)
-
-    # Add ground height
-    if options['Merge with ground']:
-        myarray.mergeArray(myamulet.height_map())
+        print(f"Seed: {seed}")
 
     def addNoise(arr, freq, amp = 1):
         arr.mergeArray( generate_perlin_noise(
@@ -61,19 +42,38 @@ def main(world: BaseLevel, dimension: Dimension, selection: SelectionGroup, opti
     frequency = 2    
 
     # Attempt at a dynamic frequency range:
-    for iter in range(1, round((myamulet.width + myamulet.height) / 32) + 1):
-        print("Foo"+str(frequency)+str(iter))
-        addNoise(myarray, frequency ** iter)
+    #for iter in range(1, round((myamulet.width + myamulet.height) / 32) + 1):
+    #    #print("Foo"+str(frequency)+str(iter))
+    #    addNoise(myarray, frequency ** iter)
 
-    # fixme: Pass arr through filter multiplying only tiles near the center.
+    addNoise(myarray, 2)
+    addNoise(myarray, 4, 0.5)
+    addNoise(myarray, 9, 0.3)
+    addNoise(myarray, 18, 0.1)
 
-    myamulet.build(np.multiply(myarray.normalised(), myamulet.height))
+    #print(myarray.arr)
+    #print(center_grid(width = myamulet.width, depth = myamulet.depth))
+
+    # Add ground height
+    if options['Merge edges']:
+        # Reduces the effect near edges (Needs work..)
+        myarray.arr = np.multiply(myarray.arr, center_grid(depth = myamulet.depth, width = myamulet.width))
+
+    # Normalise and fit selection height
+    myarray.arr = np.multiply(myarray.normalised(), myamulet.height)
+
+    # Add ground height
+    if options['Flatten'] != True:
+        myarray.arr = np.maximum(myarray.arr, myamulet.height_map())
+
+    # Build
+    myamulet.build(myarray.arr)
 
     print("Complete!")
 
 def options():
     return AmuletWrapper.options() | {
-        "Merge with ground": ["bool", False], # This effects how "smooth" the results are
+        "Merge edges": ["bool", True], # This effects how "smooth" the results are
         "Random Seed": ["int", -1] # -1 for a random
     }
 

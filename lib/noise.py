@@ -1,5 +1,11 @@
 import numpy as np
 
+try:
+    from lib.arrayhelper import ArrayHelper
+except ModuleNotFoundError:
+    # When ran directly :/
+    from arrayhelper import ArrayHelper
+
 def generate_gradients(grid_size):
     angles = np.random.rand(grid_size, grid_size) * 2 * np.pi
     gradients = np.dstack((np.cos(angles), np.sin(angles)))
@@ -51,16 +57,48 @@ def generate_perlin_noise(width, depth, height, grid_size, seed = 10):
     
     return noise
 
+def center_grid(depth, width):
+    """
+    Returns a grid of values increasing towards the center
+
+    FIXME:  This is not as good as it can be.. a 3 by 3 grid for instance foobar's it
+            I would like to round up when we half the array then drop a row to fit.
+    """
+    #print(f"Asked for: {(depth, width)}")
+          
+    myarray = ArrayHelper(depth = int(depth /2), width = int(width /2))
+
+    for row in range(myarray.arr.shape[0]):
+        myarray.arr[row] += row
+    for col in range(myarray.arr.shape[1]):
+        myarray.arr[:,col] += col 
+    
+    myarray.arr = np.concatenate((myarray.arr, np.flip(myarray.arr, 1)), 1)
+    myarray.arr = np.concatenate((myarray.arr, np.flip(myarray.arr)))
+
+    myarray.arr = myarray.normalised()
+
+    myarray.arr = np.pad(
+        myarray.arr, 
+        [(0, depth - myarray.arr.shape[0]), (0, width - myarray.arr.shape[1])], 
+        mode='constant', 
+        constant_values=0.1
+    )
+    #print(myarray.arr.shape)
+
+    return myarray.arr
 
 def main():
-    arr = generate_perlin_noise(6,10,1,2).clip(min=0)
+    #arr = generate_perlin_noise(6,10,1,4).clip(min=0)
     #print(arr)
     #arr = np.add(arr, generate_perlin_noise(6,10,1,4))
     #print(np.round(arr.clip(min=0), decimals = 6))
     #print(arr)
     #arr = np.add(arr, generate_perlin_noise(6,10,1,2))
-    arr *= (1.0/arr.max())
-    print(arr)
+    #arr *= (1.0/arr.max())
+    # arr = center_grid(5,5)
+    arr = center_grid(7,5)
+    print(np.round(arr, decimals=6))
 
     print("complete")
 

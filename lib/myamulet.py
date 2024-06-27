@@ -53,11 +53,11 @@ class AmuletWrapper:
         Returns an array of current block heights.
         Note: There must be a more efficient way to do this....
         """
-        arr = np.zeros((self.width, self.depth))
+        arr = np.zeros((self.depth, self.width))
 
-        for x in range(self.width):
+        for x in range(self.depth):
             blx = x + self.box.min_x
-            for z in range(self.depth):
+            for z in range(self.width):
                 blz = z + self.box.min_z
                 for y in range(self.height):
                     bly = y + self.box.min_y
@@ -80,13 +80,17 @@ class AmuletWrapper:
         """
         Actually place the blocks.
         """
+
+        # I hate this, I'm so confused with width and depth
+        if arr.shape != (self.width, self.depth):
+            arr = np.rot90(arr)
+
         for x in range(self.width):
             blx = x + self.box.min_x
             for z in range(self.depth):
                 blz = z + self.box.min_z
                 for y in range(self.height):
                     bly = y + self.box.min_y
-                    # print(f"debug: {blx}, {bly}, {blz}") # Debug
 
                     if arr[x][z] >= 1:
                         blk = block
