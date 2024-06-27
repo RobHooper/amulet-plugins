@@ -49,12 +49,19 @@ def generate_perlin_noise(width, depth, height, grid_size, seed = 10):
             y = i / (depth / (grid_size - 1))
             noise[i, j] = perlin_noise(x, y, gradients) * height
     
-    # Sorry!
-    return np.rot90(noise, 1)
+    return noise
 
 
 def main():
-    print(generate_perlin_noise(8,15,5,3))
+    arr = generate_perlin_noise(6,10,1,2).clip(min=0)
+    #print(arr)
+    #arr = np.add(arr, generate_perlin_noise(6,10,1,4))
+    #print(np.round(arr.clip(min=0), decimals = 6))
+    #print(arr)
+    #arr = np.add(arr, generate_perlin_noise(6,10,1,2))
+    arr *= (1.0/arr.max())
+    print(arr)
+
     print("complete")
 
 if __name__ == "__main__":

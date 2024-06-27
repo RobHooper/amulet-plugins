@@ -34,16 +34,17 @@ def main(world: BaseLevel, dimension: Dimension, selection: SelectionGroup, opti
 
     arr = np.add(
                 arr,
-                generate_perlin_noise(
+                # Sorry!
+                np.rot90(generate_perlin_noise(
                      width = myamulet.width, 
                      depth = myamulet.depth, 
                      height = myamulet.height, 
                      grid_size = options['Frequency'], 
                      seed = seed
-                     )
+                     ), 1)
             )
 
-    print(arr)
+    #print(arr)
 
     myamulet.build(arr)
 
